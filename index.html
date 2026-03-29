@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>TechLogistics</title>
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI';
+  background:linear-gradient(135deg,#0f172a,#020617);
+  color:#fff;
+}
+
+.sidebar{
+  width:240px;
+  background:#020617;
+  height:100vh;
+  position:fixed;
+  padding:25px;
+  box-shadow:0 0 20px #000;
+}
+
+.sidebar h2{
+  color:#38bdf8;
+  text-align:center;
+}
+
+.sidebar button{
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  background:linear-gradient(90deg,#1e293b,#334155);
+  border:none;
+  border-radius:10px;
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.sidebar button:hover{
+  background:#38bdf8;
+  color:#000;
+}
+
+.main{
+  margin-left:260px;
+  padding:30px;
+}
+
+.card{
+  background:#1e293b;
+  padding:25px;
+  border-radius:15px;
+  margin-bottom:25px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  background:#020617;
+  color:#fff;
+}
+
+button.action{
+  background:linear-gradient(90deg,#38bdf8,#0ea5e9);
+  color:#000;
+  font-weight:bold;
+  margin-top:15px;
+}
+
+table{
+  width:100%;
+  margin-top:20px;
+  border-collapse:collapse;
+}
+
+td,th{
+  padding:12px;
+  border-bottom:1px solid #334155;
+}
+
+tr:hover{
+  background:#020617;
+}
+
+.stat{
+  background:#020617;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 0 10px #000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>🚚 TechLog</h2>
+<button onclick="view('form')">Crear</button>
+<button onclick="view('admin')">Admin</button>
+</div>
+
+<div class="main">
+
+<!-- FORM -->
+<div id="form">
+
+<div class="card">
+<h3>Cliente</h3>
+
+<select id="tipo" onchange="toggle()">
+<option value="nuevo">Nuevo</option>
+<option value="existente">Existente</option>
+</select>
+
+<div id="nuevo">
+<input id="nombre" placeholder="Nombre" required>
+<input id="correo" placeholder="Correo" type="email" required>
+<input id="telefono" placeholder="Teléfono" required>
+</div>
+
+<div id="existente" class="hidden">
+<select id="clienteSelect"></select>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Pedido</h3>
+
+<select id="producto"></select>
+<select id="ruta"></select>
+
+<button class="action" onclick="crear()">Crear Pedido</button>
+
+</div>
+
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="hidden">
+
+<div class="grid">
+<div class="stat"><h2 id="c">0</h2><p>Clientes</p></div>
+<div class="stat"><h2 id="p">0</h2><p>Pedidos</p></div>
+<div class="stat"><h2 id="pen">0</h2><p>Pendientes</p></div>
+</div>
+
+<div class="card">
+<h3>Pedidos</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th><th>Cliente</th><th>Producto</th><th>Estado</th><th>Acciones</th>
+</tr>
+</thead>
+<tbody id="tabla"></tbody>
+</table>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const API="http://localhost:3000";
+
+function view(v){
+document.getElementById("form").classList.add("hidden");
+document.getElementById("admin").classList.add("hidden");
+document.getElementById(v).classList.remove("hidden");
+
+if(v==="admin") loadAdmin();
+}
+
+function toggle(){
+document.getElementById("nuevo").classList.toggle("hidden",tipo.value==="existente");
+document.getElementById("existente").classList.toggle("hidden",tipo.value==="nuevo");
+}
+
+async function init(){
+
+let c=await fetch(API+"/clientes").then(r=>r.json());
+clienteSelect.innerHTML="";
+c.forEach(x=>clienteSelect.innerHTML+=`<option value=${x.id_cliente}>${x.nombre}</option>`);
+
+let p=await fetch(API+"/productos").then(r=>r.json());
+producto.innerHTML="";
+p.forEach(x=>producto.innerHTML+=`<option value=${x.id_producto}>${x.nombre}</option>`);
+
+let r=await fetch(API+"/rutas").then(r=>r.json());
+ruta.innerHTML="";
+r.forEach(x=>ruta.innerHTML+=`<option value=${x.id_ruta}>${x.origen}→${x.destino}</option>`);
+
+}
+
+async function crear(){
+
+if(tipo.value==="nuevo"){
+if(!nombre.value || !correo.value.includes("@") || isNaN(telefono.value)){
+alert("Datos inválidos"); return;
+}
+
+let res=await fetch(API+"/clientes",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({nombre:nombre.value,correo:correo.value,telefono:telefono.value})});
+
+let data=await res.json();
+id_cliente=data.id;
+
+nombre.value="";correo.value="";telefono.value="";
+}else{
+id_cliente=clienteSelect.value;
+}
+
+await fetch(API+"/pedidos",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id_cliente,id_producto:producto.value,id_ruta:ruta.value})});
+
+alert("Pedido creado");
+}
+
+async function loadAdmin(){
+
+let d=await fetch(API+"/admin").then(r=>r.json());
+
+c.innerText=d.clientes;
+p.innerText=d.pedidos;
+pen.innerText=d.pendientes;
+
+tabla.innerHTML="";
+
+d.detalle.forEach(x=>{
+tabla.innerHTML+=`
+<tr>
+<td>${x.id_pedido}</td>
+<td>${x.id_cliente}</td>
+<td>${x.producto}</td>
+<td>
+<select onchange="cambiar(${x.id_pedido},this.value)">
+<option ${x.estado=="Pendiente"?"selected":""}>Pendiente</option>
+<option ${x.estado=="En ruta"?"selected":""}>En ruta</option>
+<option ${x.estado=="Entregado"?"selected":""}>Entregado</option>
+</select>
+</td>
+<td>
+<button onclick="delPed(${x.id_pedido})">❌</button>
+</td>
+</tr>
+`;
+});
+
+}
+
+async function cambiar(id,estado){
+await fetch(API+"/pedidos/"+id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({estado})});
+loadAdmin();
+}
+
+async function delPed(id){
+await fetch(API+"/pedidos/"+id,{method:"DELETE"});
+loadAdmin();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
