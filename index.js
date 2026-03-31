@@ -10,187 +10,212 @@ const db = mysql.createConnection({
   host: "sql10.freesqldatabase.com",
   user: "sql10821498",
   password: "mx6YJPM5jB",
-  database: "sql10821498"
+  database: "sql10821498",
+  port: 3306,
+  charset: "latin1"
 });
 
 db.connect(err => {
-  if (err) throw err;
-  console.log("Conectado a MySQL");
+  if (err) { console.log("ERROR MYSQL:", err); return; }
+  console.log("MySQL conectado");
 });
 
 
-// ================= CLIENTES =================
-app.get("/clientes",(req,res)=>{
-  db.query("SELECT * FROM Clientes",(e,r)=>res.json(r));
+// ===== CLIENTES =====
+app.get("/clientes", (req, res) => {
+  db.query("SELECT * FROM Clientes", (e, r) => {
+    if (e) { console.log(e); return res.status(500).json(e); }
+    res.json(r);
+  });
 });
 
-app.post("/clientes",(req,res)=>{
-  const {nombre, correo, telefono} = req.body;
-
+app.post("/clientes", (req, res) => {
+  const { nombre, correo, telefono } = req.body;
   db.query(
-    "INSERT INTO Clientes (nombre, correo, telefono) VALUES (?,?,?)",
+    "INSERT INTO Clientes (nombre, correo, telefono) VALUES (?, ?, ?)",
     [nombre, correo, telefono],
-    (e,r)=>res.json({id:r.insertId})
-  );
-});
-
-app.delete("/clientes/:id",(req,res)=>{
-  db.query("DELETE FROM Clientes WHERE id_cliente=?",[req.params.id],()=>res.json({ok:true}));
-});
-
-
-// ================= PRODUCTOS =================
-app.get("/productos",(req,res)=>{
-  db.query("SELECT * FROM Productos",(e,r)=>res.json(r));
-});
-
-
-// ================= RUTAS =================
-app.get("/rutas",(req,res)=>{
-  db.query("SELECT * FROM Rutas",(e,r)=>res.json(r));
-});
-
-
-// ================= PEDIDOS =================
-app.get("/pedidos",(req,res)=>{
-  db.query(`
-    SELECT p.*, c.nombre cliente
-    FROM Pedidos p
-    LEFT JOIN Clientes c ON c.id_cliente=p.id_cliente
-    ORDER BY p.id_pedido DESC
-  `,(e,r)=>res.json(r));
-});
-
-
-app.post("/pedidos",(req,res)=>{
-
-  // 🔴 AQUÍ estaba tu error si esto faltaba
-  const {id_cliente, id_producto, id_ruta} = req.body;
-
-  if(!id_cliente || !id_producto || !id_ruta){
-    return res.status(400).json({error:"Datos incompletos"});
-  }
-
-  const fecha = new Date();
-  const estado = "Pendiente";
-  const cantidad = 1;
-
-  // PRODUCTO
-  db.query(
-    "SELECT nombre FROM Productos WHERE id_producto=?",
-    [id_producto],
-    (e,prod)=>{
-
-      if(e || prod.length === 0){
-        return res.status(400).json({error:"Producto no válido"});
-      }
-
-      const producto = prod[0].nombre;
-
-      // RUTA
-      db.query(
-        "SELECT * FROM Rutas WHERE id_ruta=?",
-        [id_ruta],
-        (e2,ruta)=>{
-
-          if(e2 || ruta.length === 0){
-            return res.status(400).json({error:"Ruta no válida"});
-          }
-
-          const origen = ruta[0].origen;
-          const destino = ruta[0].destino;
-
-          // TRANSPORTISTA ALEATORIO
-          db.query(
-            "SELECT id_transportista FROM Transportistas ORDER BY RAND() LIMIT 1",
-            (e3,t)=>{
-
-              const id_transportista = t[0].id_transportista;
-
-              // INSERT PEDIDO
-              db.query(`
-                INSERT INTO Pedidos
-                (id_cliente,id_transportista,id_ruta,fecha,origen,destino,producto,estado)
-                VALUES (?,?,?,?,?,?,?,?)
-              `,
-              [id_cliente,id_transportista,id_ruta,fecha,origen,destino,producto,estado],
-              (err,result)=>{
-
-                const id_pedido = result.insertId;
-
-                // DETALLE
-                db.query(`
-                  INSERT INTO Detalle_Pedido (id_pedido,id_producto,cantidad)
-                  VALUES (?,?,?)
-                `,
-                [id_pedido,id_producto,cantidad]);
-
-                // ESTADO ENVÍO
-                db.query(`
-                  INSERT INTO Estados_Envio (id_pedido,estado,fecha_actualizacion)
-                  VALUES (?,?,?)
-                `,
-                [id_pedido,estado,fecha]);
-
-                res.json({ok:true});
-              });
-
-            });
-        });
-    });
-});
-
-
-// ACTUALIZAR ESTADO
-app.put("/pedidos/:id",(req,res)=>{
-  const {estado} = req.body;
-
-  db.query(
-    "UPDATE Pedidos SET estado=? WHERE id_pedido=?",
-    [estado,req.params.id],
-    ()=>{
-
-      // historial también
-      db.query(`
-        INSERT INTO Estados_Envio (id_pedido,estado,fecha_actualizacion)
-        VALUES (?,?,NOW())
-      `,[req.params.id,estado]);
-
-      res.json({ok:true});
+    (e, r) => {
+      if (e) { console.log(e); return res.status(500).json(e); }
+      res.json({ id: r.insertId });
     }
   );
 });
 
 
-// ELIMINAR
-app.delete("/pedidos/:id",(req,res)=>{
-  db.query("DELETE FROM Pedidos WHERE id_pedido=?",[req.params.id],()=>res.json({ok:true}));
+// ===== PRODUCTOS =====
+app.get("/productos", (req, res) => {
+  db.query("SELECT * FROM Productos", (e, r) => {
+    if (e) { console.log(e); return res.status(500).json(e); }
+    res.json(r);
+  });
 });
 
 
-// ================= ADMIN =================
-app.get("/admin",(req,res)=>{
+// ===== RUTAS =====
+app.get("/rutas", (req, res) => {
+  db.query("SELECT * FROM Rutas", (e, r) => {
+    if (e) { console.log(e); return res.status(500).json(e); }
+    res.json(r);
+  });
+});
 
-  const data = {};
 
-  db.query("SELECT COUNT(*) total FROM Clientes",(e,r)=>{
-    data.clientes = r[0].total;
+// ===== TRANSPORTISTAS =====
+app.get("/transportistas", (req, res) => {
+  db.query("SELECT * FROM Transportistas", (e, r) => {
+    if (e) { console.log(e); return res.status(500).json(e); }
+    res.json(r);
+  });
+});
 
-    db.query("SELECT COUNT(*) total FROM Pedidos",(e2,r2)=>{
-      data.pedidos = r2[0].total;
 
-      db.query("SELECT COUNT(*) total FROM Pedidos WHERE estado='Pendiente'",(e3,r3)=>{
-        data.pendientes = r3[0].total;
+// ===== ESTADOS ENVIO =====
+app.get("/estados", (req, res) => {
+  db.query("SELECT * FROM Estados_Envio", (e, r) => {
+    if (e) { console.log(e); return res.status(500).json(e); }
+    res.json(r);
+  });
+});
 
-        db.query("SELECT * FROM Pedidos",(e4,r4)=>{
-          data.detalle = r4;
-          res.json(data);
-        });
 
+// ===== CREAR PEDIDO =====
+app.post("/pedidos", (req, res) => {
+  const { id_cliente, id_producto, id_ruta } = req.body;
+
+  if (!id_cliente || !id_producto || !id_ruta) {
+    return res.status(400).json({ error: "Datos incompletos" });
+  }
+
+  const fecha = new Date();
+  const estado = "Pendiente";
+
+  db.query(
+    "INSERT INTO Pedidos (id_cliente, id_ruta, fecha, estado) VALUES (?, ?, ?, ?)",
+    [id_cliente, id_ruta, fecha, estado],
+    (err, result) => {
+      if (err) { console.log(err); return res.status(500).json(err); }
+
+      const id_pedido = result.insertId;
+
+      db.query(
+        "INSERT INTO Detalle_Pedido (id_pedido, id_producto, cantidad) VALUES (?, ?, 1)",
+        [id_pedido, id_producto],
+        (e2) => {
+          if (e2) { console.log(e2); return res.status(500).json(e2); }
+          res.json({ ok: true, id_pedido });
+        }
+      );
+    }
+  );
+});
+
+
+// ===== ACTUALIZAR ESTADO =====
+app.put("/pedidos/:id", (req, res) => {
+  const { estado } = req.body;
+  db.query(
+    "UPDATE Pedidos SET estado = ? WHERE id_pedido = ?",
+    [estado, req.params.id],
+    (e) => {
+      if (e) { console.log(e); return res.status(500).json(e); }
+      res.json({ ok: true });
+    }
+  );
+});
+
+
+// ===== ELIMINAR PEDIDO =====
+// Orden obligatorio por foreign keys:
+// 1) Estados_Envio  →  2) Detalle_Pedido  →  3) Pedidos
+app.delete("/pedidos/:id", (req, res) => {
+  const id = req.params.id;
+
+  // Paso 1: borrar de Estados_Envio
+  db.query("DELETE FROM Estados_Envio WHERE id_pedido = ?", [id], (e1) => {
+    if (e1) {
+      console.log("ERROR borrando Estados_Envio:", e1);
+      return res.status(500).json({ error: "Error al borrar Estados_Envio", detail: e1 });
+    }
+
+    // Paso 2: borrar de Detalle_Pedido
+    db.query("DELETE FROM Detalle_Pedido WHERE id_pedido = ?", [id], (e2) => {
+      if (e2) {
+        console.log("ERROR borrando Detalle_Pedido:", e2);
+        return res.status(500).json({ error: "Error al borrar Detalle_Pedido", detail: e2 });
+      }
+
+      // Paso 3: borrar el pedido principal
+      db.query("DELETE FROM Pedidos WHERE id_pedido = ?", [id], (e3) => {
+        if (e3) {
+          console.log("ERROR borrando Pedido:", e3);
+          return res.status(500).json({ error: "Error al borrar Pedido", detail: e3 });
+        }
+
+        res.json({ ok: true });
       });
     });
   });
-
 });
 
-app.listen(3000, ()=>console.log("Servidor en http://localhost:3000"));
+
+// ===== ADMIN =====
+app.get("/admin", (req, res) => {
+
+  const queryDetalle = `
+    SELECT
+      p.id_pedido,
+      p.id_cliente,
+      c.nombre   AS cliente,
+      c.correo   AS correo,
+      c.telefono AS telefono,
+      (
+        SELECT pr.nombre
+        FROM Detalle_Pedido dp
+        LEFT JOIN Productos pr ON pr.id_producto = dp.id_producto
+        WHERE dp.id_pedido = p.id_pedido
+        LIMIT 1
+      ) AS producto,
+      CONCAT(
+        CONVERT(r.origen  USING latin1),
+        CONVERT(' - '     USING latin1),
+        CONVERT(r.destino USING latin1)
+      ) AS ruta,
+      p.estado,
+      p.fecha
+    FROM Pedidos p
+    LEFT JOIN Clientes c ON c.id_cliente = p.id_cliente
+    LEFT JOIN Rutas    r ON r.id_ruta    = p.id_ruta
+    ORDER BY p.id_pedido DESC
+  `;
+
+  db.query(queryDetalle, (err, detalle) => {
+    if (err) {
+      console.log("ERROR detalle admin:", err);
+      return res.status(500).json(err);
+    }
+
+    db.query("SELECT COUNT(*) AS total FROM Clientes", (e1, resC) => {
+      db.query("SELECT COUNT(*) AS total FROM Pedidos", (e2, resP) => {
+        db.query("SELECT COUNT(*) AS total FROM Pedidos WHERE estado = 'Pendiente'", (e3, resPen) => {
+          db.query("SELECT COUNT(*) AS total FROM Pedidos WHERE estado = 'Entregado'", (e4, resEnt) => {
+
+            res.json({
+              clientes:   resC?.[0]?.total   || 0,
+              pedidos:    resP?.[0]?.total    || 0,
+              pendientes: resPen?.[0]?.total  || 0,
+              entregados: resEnt?.[0]?.total  || 0,
+              detalle:    detalle || []
+            });
+
+          });
+        });
+      });
+    });
+  });
+});
+
+
+// ===== SERVER =====
+app.listen(3000, () => {
+  console.log("Servidor en http://localhost:3000");
+});

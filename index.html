@@ -2,274 +2,462 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>TechLogistics</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechLogistics — Portal</title>
 <style>
-body{
-  margin:0;
-  font-family:'Segoe UI';
-  background:linear-gradient(135deg,#0f172a,#020617);
-  color:#fff;
-}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f1f5f9;color:#0f172a;min-height:100vh;display:flex}
 
-.sidebar{
-  width:240px;
-  background:#020617;
-  height:100vh;
-  position:fixed;
-  padding:25px;
-  box-shadow:0 0 20px #000;
-}
+/* SIDEBAR */
+.sidebar{width:220px;min-height:100vh;background:#fff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:10}
+.sidebar-logo{padding:22px 20px 16px;border-bottom:1px solid #e2e8f0}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:#185FA5;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:18px;height:18px;fill:white}
+.logo-text{font-size:15px;font-weight:600;color:#0f172a}
+.logo-sub{font-size:11px;color:#64748b;margin-top:1px}
+.nav{padding:12px 10px;flex:1}
+.nav-label{font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;padding:10px 10px 4px}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-size:13px;color:#64748b;text-align:left;transition:.15s}
+.nav-btn:hover{background:#f1f5f9;color:#0f172a}
+.nav-btn.active{background:#EFF6FF;color:#185FA5;font-weight:500}
+.nav-btn svg{width:16px;height:16px;flex-shrink:0}
+.sidebar-footer{padding:16px;border-top:1px solid #e2e8f0}
+.user-row{display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1D4ED8;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:#0f172a}
+.user-role{font-size:11px;color:#64748b}
 
-.sidebar h2{
-  color:#38bdf8;
-  text-align:center;
-}
+/* MAIN */
+.main{margin-left:220px;flex:1;padding:32px 36px;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:28px}
+.page-title{font-size:20px;font-weight:600;color:#0f172a}
+.page-sub{font-size:13px;color:#64748b;margin-top:3px}
 
-.sidebar button{
-  width:100%;
-  margin-top:15px;
-  padding:12px;
-  background:linear-gradient(90deg,#1e293b,#334155);
-  border:none;
-  border-radius:10px;
-  color:#fff;
-  cursor:pointer;
-  transition:0.3s;
-}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px}
+.stat-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:8px}
+.stat-value{font-size:28px;font-weight:600}
+.stat-value.blue{color:#185FA5}
+.stat-value.green{color:#15803D}
+.stat-value.amber{color:#B45309}
+.stat-value.slate{color:#475569}
+.stat-trend{font-size:11px;color:#94a3b8;margin-top:4px}
 
-.sidebar button:hover{
-  background:#38bdf8;
-  color:#000;
-}
+/* CARDS */
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.card-title{font-size:14px;font-weight:600;color:#0f172a}
 
-.main{
-  margin-left:260px;
-  padding:30px;
-}
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+label{font-size:12px;color:#475569;font-weight:500}
+input,select{padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;font-size:13px;width:100%;outline:none;transition:.15s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+input::placeholder{color:#94a3b8}
 
-.card{
-  background:#1e293b;
-  padding:25px;
-  border-radius:15px;
-  margin-bottom:25px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
-}
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#0f172a;font-size:13px;cursor:pointer;transition:.15s;font-weight:500}
+.btn:hover{background:#f8fafc;border-color:#cbd5e1}
+.btn-primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.btn-primary:hover{background:#1D4ED8;border-color:#1D4ED8}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-danger{background:#FEF2F2;color:#B91C1C;border-color:#FECACA;font-size:12px;padding:5px 12px}
+.btn-danger:hover{background:#FEE2E2}
 
-input,select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:10px;
-  border:none;
-  background:#020617;
-  color:#fff;
-}
+/* SEGMENT */
+.segment-row{display:flex;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:3px;gap:2px;margin-bottom:20px;width:fit-content}
+.seg-btn{padding:6px 18px;border:none;background:transparent;border-radius:6px;cursor:pointer;font-size:13px;color:#64748b;transition:.15s}
+.seg-btn.active{background:#fff;color:#0f172a;box-shadow:0 1px 3px rgba(0,0,0,.1);font-weight:500}
 
-button.action{
-  background:linear-gradient(90deg,#38bdf8,#0ea5e9);
-  color:#000;
-  font-weight:bold;
-  margin-top:15px;
-}
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e2e8f0;background:#f8fafc}
+thead th:first-child{border-radius:8px 0 0 0}
+thead th:last-child{border-radius:0 8px 0 0}
+tbody td{padding:13px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#f8fafc}
 
-table{
-  width:100%;
-  margin-top:20px;
-  border-collapse:collapse;
-}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;gap:5px}
+.badge:before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.badge-pending{background:#FEF3C7;color:#92400E}.badge-pending:before{background:#D97706}
+.badge-transit{background:#DBEAFE;color:#1D4ED8}.badge-transit:before{background:#3B82F6}
+.badge-delivered{background:#DCFCE7;color:#15803D}.badge-delivered:before{background:#22C55E}
 
-td,th{
-  padding:12px;
-  border-bottom:1px solid #334155;
-}
+/* CLIENT CELL */
+.client-cell{display:flex;align-items:center;gap:10px}
+.client-avatar{width:32px;height:32px;border-radius:50%;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1D4ED8;flex-shrink:0}
+.client-name{font-weight:500;font-size:13px;color:#0f172a}
+.client-email{font-size:11px;color:#64748b;margin-top:1px}
 
-tr:hover{
-  background:#020617;
-}
-
-.stat{
-  background:#020617;
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-  box-shadow:0 0 10px #000;
-}
+/* MISC */
+.divider{border:none;border-top:1px solid #e2e8f0;margin:16px 0}
+.search-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.search-input{flex:1;max-width:320px;padding:8px 12px 8px 34px;border:1px solid #cbd5e1;border-radius:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center #fff;color:#0f172a;font-size:13px;outline:none}
+.search-input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.empty{text-align:center;padding:40px;color:#94a3b8;font-size:13px}
+.inline-select{padding:5px 8px;font-size:12px;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;color:#0f172a;cursor:pointer}
 </style>
 </head>
-
 <body>
 
 <div class="sidebar">
-<h2>🚚 TechLog</h2>
-<button onclick="view('form')">Crear</button>
-<button onclick="view('admin')">Admin</button>
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M1 3h15v13H1zm15 5 7 3v5h-7M1 21l2-5h10l2 5M10 6v7"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">TechLogistics</div>
+        <div class="logo-sub">Portal de gestión</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-label">Operaciones</div>
+    <button class="nav-btn" onclick="showPage('form')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="13" height="13" rx="2"/><path d="M5 7H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+      Nuevo pedido
+    </button>
+    <button class="nav-btn active" onclick="showPage('admin')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <div class="nav-label" style="margin-top:8px">Catálogos</div>
+    <button class="nav-btn" onclick="showPage('clientes-page')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Clientes
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">AD</div>
+      <div>
+        <div class="user-name">Administrador</div>
+        <div class="user-role">Acceso total</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="main">
 
-<!-- FORM -->
-<div id="form">
+  <!-- DASHBOARD -->
+  <div id="admin" class="page active">
+    <div class="page-header">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Resumen general de operaciones</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total clientes</div>
+        <div class="stat-value blue" id="s-clientes">—</div>
+        <div class="stat-trend">Registrados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total pedidos</div>
+        <div class="stat-value slate" id="s-pedidos">—</div>
+        <div class="stat-trend">Histórico</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pendientes</div>
+        <div class="stat-value amber" id="s-pendientes">—</div>
+        <div class="stat-trend">Por despachar</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Entregados</div>
+        <div class="stat-value green" id="s-entregados">—</div>
+        <div class="stat-trend">Completados</div>
+      </div>
+    </div>
 
-<div class="card">
-<h3>Cliente</h3>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Pedidos recientes</div>
+        <button class="btn btn-sm" onclick="loadAdmin()">↻ Actualizar</button>
+      </div>
+      <div class="search-bar">
+        <input class="search-input" id="search-pedidos" placeholder="Buscar por cliente, producto..." oninput="filterTable()">
+        <select class="inline-select" id="filter-estado" onchange="filterTable()">
+          <option value="">Todos los estados</option>
+          <option value="Pendiente">Pendiente</option>
+          <option value="En ruta">En ruta</option>
+          <option value="Entregado">Entregado</option>
+        </select>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:60px">#</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Ruta</th>
+            <th>Estado</th>
+            <th style="width:90px">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla"></tbody>
+      </table>
+    </div>
+  </div>
 
-<select id="tipo" onchange="toggle()">
-<option value="nuevo">Nuevo</option>
-<option value="existente">Existente</option>
-</select>
+  <!-- NUEVO PEDIDO -->
+  <div id="form" class="page">
+    <div class="page-header">
+      <div class="page-title">Nuevo pedido</div>
+      <div class="page-sub">Registra un pedido para un cliente nuevo o existente</div>
+    </div>
 
-<div id="nuevo">
-<input id="nombre" placeholder="Nombre" required>
-<input id="correo" placeholder="Correo" type="email" required>
-<input id="telefono" placeholder="Teléfono" required>
-</div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Información del cliente</div></div>
+      <div class="segment-row">
+        <button class="seg-btn active" id="seg-nuevo" onclick="setTipo('nuevo')">Cliente nuevo</button>
+        <button class="seg-btn" id="seg-existente" onclick="setTipo('existente')">Cliente existente</button>
+      </div>
 
-<div id="existente" class="hidden">
-<select id="clienteSelect"></select>
-</div>
+      <div id="nuevo-form">
+        <div class="form-grid">
+          <div class="form-group"><label>Nombre completo</label><input id="nombre" placeholder="Ej: María García"></div>
+          <div class="form-group"><label>Correo electrónico</label><input id="correo" type="email" placeholder="correo@empresa.com"></div>
+          <div class="form-group"><label>Teléfono</label><input id="telefono" placeholder="+57 300 000 0000"></div>
+        </div>
+      </div>
 
-</div>
+      <div id="existente-form" style="display:none">
+        <div class="form-group" style="max-width:360px">
+          <label>Seleccionar cliente</label>
+          <select id="clienteSelect"></select>
+        </div>
+      </div>
+    </div>
 
-<div class="card">
-<h3>Pedido</h3>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Detalles del pedido</div></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Producto</label><select id="producto"></select></div>
+        <div class="form-group"><label>Ruta de despacho</label><select id="ruta"></select></div>
+      </div>
+      <hr class="divider">
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button class="btn" onclick="showPage('admin')">Cancelar</button>
+        <button class="btn btn-primary" onclick="crear()">Crear pedido</button>
+      </div>
+    </div>
+  </div>
 
-<select id="producto"></select>
-<select id="ruta"></select>
-
-<button class="action" onclick="crear()">Crear Pedido</button>
-
-</div>
-
-</div>
-
-<!-- ADMIN -->
-<div id="admin" class="hidden">
-
-<div class="grid">
-<div class="stat"><h2 id="c">0</h2><p>Clientes</p></div>
-<div class="stat"><h2 id="p">0</h2><p>Pedidos</p></div>
-<div class="stat"><h2 id="pen">0</h2><p>Pendientes</p></div>
-</div>
-
-<div class="card">
-<h3>Pedidos</h3>
-<table>
-<thead>
-<tr>
-<th>ID</th><th>Cliente</th><th>Producto</th><th>Estado</th><th>Acciones</th>
-</tr>
-</thead>
-<tbody id="tabla"></tbody>
-</table>
-</div>
-
-</div>
+  <!-- CLIENTES -->
+  <div id="clientes-page" class="page">
+    <div class="page-header">
+      <div class="page-title">Clientes</div>
+      <div class="page-sub">Directorio de clientes registrados</div>
+    </div>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Pedidos</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-clientes"></tbody>
+      </table>
+    </div>
+  </div>
 
 </div>
 
 <script>
+const API = "http://localhost:3000";
+let allRows = [];
+let tipoActual = "nuevo";
 
-const API="http://localhost:3000";
-
-function view(v){
-document.getElementById("form").classList.add("hidden");
-document.getElementById("admin").classList.add("hidden");
-document.getElementById(v).classList.remove("hidden");
-
-if(v==="admin") loadAdmin();
+function showPage(v) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(v).classList.add('active');
+  if (v === 'admin') loadAdmin();
+  if (v === 'clientes-page') loadClientes();
 }
 
-function toggle(){
-document.getElementById("nuevo").classList.toggle("hidden",tipo.value==="existente");
-document.getElementById("existente").classList.toggle("hidden",tipo.value==="nuevo");
+function setTipo(t) {
+  tipoActual = t;
+  document.getElementById('nuevo-form').style.display = t === 'nuevo' ? 'block' : 'none';
+  document.getElementById('existente-form').style.display = t === 'existente' ? 'block' : 'none';
+  document.getElementById('seg-nuevo').classList.toggle('active', t === 'nuevo');
+  document.getElementById('seg-existente').classList.toggle('active', t === 'existente');
 }
 
-async function init(){
-
-let c=await fetch(API+"/clientes").then(r=>r.json());
-clienteSelect.innerHTML="";
-c.forEach(x=>clienteSelect.innerHTML+=`<option value=${x.id_cliente}>${x.nombre}</option>`);
-
-let p=await fetch(API+"/productos").then(r=>r.json());
-producto.innerHTML="";
-p.forEach(x=>producto.innerHTML+=`<option value=${x.id_producto}>${x.nombre}</option>`);
-
-let r=await fetch(API+"/rutas").then(r=>r.json());
-ruta.innerHTML="";
-r.forEach(x=>ruta.innerHTML+=`<option value=${x.id_ruta}>${x.origen}→${x.destino}</option>`);
-
+function initials(name) {
+  if (!name) return '?';
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
 }
 
-async function crear(){
-
-if(tipo.value==="nuevo"){
-if(!nombre.value || !correo.value.includes("@") || isNaN(telefono.value)){
-alert("Datos inválidos"); return;
+async function init() {
+  try {
+    let [clts, prods, rutas] = await Promise.all([
+      fetch(API + "/clientes").then(r => r.json()),
+      fetch(API + "/productos").then(r => r.json()),
+      fetch(API + "/rutas").then(r => r.json())
+    ]);
+    const cs = document.getElementById('clienteSelect');
+    cs.innerHTML = '';
+    clts.forEach(x => cs.innerHTML += `<option value="${x.id_cliente}">${x.nombre} — ${x.correo}</option>`);
+    const pd = document.getElementById('producto');
+    pd.innerHTML = '';
+    prods.forEach(x => pd.innerHTML += `<option value="${x.id_producto}">${x.nombre}</option>`);
+    const rt = document.getElementById('ruta');
+    rt.innerHTML = '';
+    rutas.forEach(x => rt.innerHTML += `<option value="${x.id_ruta}">${x.origen} → ${x.destino}</option>`);
+  } catch(e) { console.log('Init error', e); }
 }
 
-let res=await fetch(API+"/clientes",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({nombre:nombre.value,correo:correo.value,telefono:telefono.value})});
-
-let data=await res.json();
-id_cliente=data.id;
-
-nombre.value="";correo.value="";telefono.value="";
-}else{
-id_cliente=clienteSelect.value;
+async function crear() {
+  let id_cliente;
+  if (tipoActual === 'nuevo') {
+    const n = document.getElementById('nombre').value.trim();
+    const c = document.getElementById('correo').value.trim();
+    const t = document.getElementById('telefono').value.trim();
+    if (!n || !c.includes('@') || !t) { alert('Completa todos los campos correctamente'); return; }
+    let res = await fetch(API + "/clientes", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre: n, correo: c, telefono: t })
+    });
+    let data = await res.json();
+    id_cliente = data.id;
+    document.getElementById('nombre').value = '';
+    document.getElementById('correo').value = '';
+    document.getElementById('telefono').value = '';
+    init();
+  } else {
+    id_cliente = document.getElementById('clienteSelect').value;
+  }
+  const idProd = document.getElementById('producto').value;
+  const idRuta = document.getElementById('ruta').value;
+  await fetch(API + "/pedidos", {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id_cliente, id_producto: idProd, id_ruta: idRuta })
+  });
+  alert('Pedido creado exitosamente');
+  showPage('admin');
 }
 
-await fetch(API+"/pedidos",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({id_cliente,id_producto:producto.value,id_ruta:ruta.value})});
-
-alert("Pedido creado");
+async function loadAdmin() {
+  try {
+    let d = await fetch(API + "/admin").then(r => r.json());
+    document.getElementById('s-clientes').textContent = d.clientes;
+    document.getElementById('s-pedidos').textContent = d.pedidos;
+    document.getElementById('s-pendientes').textContent = d.pendientes;
+    const entregados = (d.detalle || []).filter(x => x.estado === 'Entregado').length;
+    document.getElementById('s-entregados').textContent = entregados;
+    allRows = d.detalle || [];
+    renderTable(allRows);
+  } catch(e) {
+    document.getElementById('tabla').innerHTML = `<tr><td colspan="6" class="empty">No se pudo conectar al servidor (${API})</td></tr>`;
+  }
 }
 
-async function loadAdmin(){
-
-let d=await fetch(API+"/admin").then(r=>r.json());
-
-c.innerText=d.clientes;
-p.innerText=d.pedidos;
-pen.innerText=d.pendientes;
-
-tabla.innerHTML="";
-
-d.detalle.forEach(x=>{
-tabla.innerHTML+=`
-<tr>
-<td>${x.id_pedido}</td>
-<td>${x.id_cliente}</td>
-<td>${x.producto}</td>
-<td>
-<select onchange="cambiar(${x.id_pedido},this.value)">
-<option ${x.estado=="Pendiente"?"selected":""}>Pendiente</option>
-<option ${x.estado=="En ruta"?"selected":""}>En ruta</option>
-<option ${x.estado=="Entregado"?"selected":""}>Entregado</option>
-</select>
-</td>
-<td>
-<button onclick="delPed(${x.id_pedido})">❌</button>
-</td>
-</tr>
-`;
-});
-
+function filterTable() {
+  const q = document.getElementById('search-pedidos').value.toLowerCase();
+  const est = document.getElementById('filter-estado').value;
+  const filtered = allRows.filter(x => {
+    const match = (x.cliente || '').toLowerCase().includes(q) || (x.producto || '').toLowerCase().includes(q);
+    const estMatch = !est || x.estado === est;
+    return match && estMatch;
+  });
+  renderTable(filtered);
 }
 
-async function cambiar(id,estado){
-await fetch(API+"/pedidos/"+id,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({estado})});
-loadAdmin();
+function renderTable(rows) {
+  const t = document.getElementById('tabla');
+  if (!rows.length) { t.innerHTML = `<tr><td colspan="6" class="empty">Sin resultados</td></tr>`; return; }
+  t.innerHTML = rows.map(x => {
+    const badgeClass = x.estado === 'Entregado' ? 'badge-delivered' : x.estado === 'En ruta' ? 'badge-transit' : 'badge-pending';
+    return `
+      <tr>
+        <td style="color:#94a3b8;font-size:12px">#${x.id_pedido}</td>
+        <td>
+          <div class="client-cell">
+            <div class="client-avatar">${initials(x.cliente)}</div>
+            <div>
+              <div class="client-name">${x.cliente || '—'}</div>
+              <div class="client-email">${x.correo || x.telefono || '—'}</div>
+            </div>
+          </div>
+        </td>
+        <td>${x.producto || '—'}</td>
+        <td style="font-size:12px;color:#64748b">${x.ruta || '—'}</td>
+        <td>
+          <select class="inline-select" onchange="cambiar(${x.id_pedido},this.value)">
+            <option ${x.estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+            <option ${x.estado === 'En ruta' ? 'selected' : ''}>En ruta</option>
+            <option ${x.estado === 'Entregado' ? 'selected' : ''}>Entregado</option>
+          </select>
+        </td>
+        <td><button class="btn btn-danger" onclick="delPed(${x.id_pedido})">Eliminar</button></td>
+      </tr>
+    `;
+  }).join('');
 }
 
-async function delPed(id){
-await fetch(API+"/pedidos/"+id,{method:"DELETE"});
-loadAdmin();
+async function cambiar(id, estado) {
+  await fetch(API + "/pedidos/" + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estado })
+  });
+  loadAdmin();
 }
+
+async function delPed(id) {
+  if (!confirm('¿Eliminar este pedido?')) return;
+  await fetch(API + "/pedidos/" + id, { method: 'DELETE' });
+  loadAdmin();
+}
+
+async function loadClientes() {
+  try {
+    let [clts, adm] = await Promise.all([
+      fetch(API + "/clientes").then(r => r.json()),
+      fetch(API + "/admin").then(r => r.json())
+    ]);
+    const pedByClient = {};
+    (adm.detalle || []).forEach(p => {
+      pedByClient[p.id_cliente] = (pedByClient[p.id_cliente] || 0) + 1;
+    });
+    const t = document.getElementById('tabla-clientes');
+    t.innerHTML = clts.map(c => `
+      <tr>
+        <td>
+          <div class="client-cell">
+            <div class="client-avatar">${initials(c.nombre)}</div>
+            <div>
+              <div class="client-name">${c.nombre}</div>
+              <div class="client-email">${c.correo}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:13px;color:#64748b">${c.telefono || '—'}</td>
+        <td><span style="font-weight:600">${pedByClient[c.id_cliente] || 0}</span></td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    document.getElementById('tabla-clientes').innerHTML = `<tr><td colspan="3" class="empty">No se pudo cargar</td></tr>`;
+  }
+}
+
 
 init();
-
+loadAdmin();
 </script>
-
 </body>
 </html>
